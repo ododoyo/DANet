@@ -101,6 +101,7 @@ class Prework(object):
         create_folders(self.train_event_dir)
         create_folders(self.valid_event_dir)
         create_folders(self.best_loss_dir)
+        shutil.copy("config.py", os.path.join(self.job_dir, "config.py"))
         self.copy_data_dir(self.sorted_train_dir, self.train_dir)
         self.copy_data_dir(self.sorted_valid_dir, self.valid_dir)
         if self.global_cmvn_norm:
