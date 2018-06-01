@@ -194,7 +194,7 @@ class AnchoredEstimator(Estimator):
             self.name = type(self).__name__
 
     def _build(self, s_embed, s_mixed, s_sources, seq_mask):
-        embedding_dim = tf.shape(s_embed)[3]
+        embedding_dim = self._cfg.embedding_dim
         batch_size = tf.shape(s_embed)[0]
         N = self._cfg.MAX_SOURCE_NUM
         num_anchors = self._cfg.num_anchors
