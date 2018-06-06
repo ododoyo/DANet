@@ -96,6 +96,56 @@ class TF_DatasetInput(object):
             valid_iterator = None
         return next_batch, handle, train_iterator, valid_iterator
 
+class TF_EvalDataset(object):
+    def __init__(self, data_dir, batch_size=16, num_sources=2):
+        self.data_dir = data_dir
+        self.num_sources = num_sources
+        self.batch_size = batch_size
+        self.data_list, self.key_list = self.gen_list(data_dir)
+        self.num_sample = len(self.data_list)
+
+
+    def gen_list(self, data_dir):
+        feats_scp = os.path.join(data_dir, "feats.scp")
+        len_scp = os.path.join(data_dir, "feats.len")
+        res_list = []
+        key_list = []
+        with open(feats_scp, 'r') as ff, open(len_scp, 'r') as lf:
+            for f_line, l_line in zip(ff.readlines(), lf.readlines()):
+                f_line = f_line.strip().split(' ')
+                l_line = l_line.strip().split(' ')
+                assert f_line[0] == l_line[0]
+                res_list.append([f_line[1], int(l_line[1])])
+                key_list.append(f_line[0])
+        return res_list, key_list
+
+    def gen_eval(self):
+        for ele in self.data_list:
+            feats = kaldi_io.read_mat(ele[0])
+            frames = ele[1]
+            yield feats, frames
+
+    def slice_example(self, feats, frames):
+        frames = tf.cast(frames, tf.int32)
+        input_mix = feats[0:frames]
+        fft_size = tf.shape(input_mix)[-1]
+        labels = tf.zeros([self.num_sources, frames, fft_size], dtype=tf.float32)
+        gender = tf.zeros([self.num_sources], dtype=tf.int32)
+        return input_mix, labels, frames, gender
+
+    def build(self, fft_size):
+        padded_shapes = (tf.TensorShape([None, fft_size]),
+                        tf.TensorShape([self.num_sources, None, fft_size]),
+                        tf.TensorShape([]),
+                        tf.TensorShape([self.num_sources]))
+        dataset = tf.data.Dataset.from_generator(self.gen_eval, (tf.float32, tf.int32),
+                                                 (tf.TensorShape([None, fft_size]), tf.TensorShape([])))
+        dataset = dataset.map(self.slice_example)
+        dataset = dataset.padded_batch(self.batch_size, padded_shapes=padded_shapes)
+        iterator = dataset.make_one_shot_iterator()
+        next_batch = iterator.get_next()
+        return next_batch
+
 def Create_Input_Placeholder(feat_dims, num_sources):
     input_mix = tf.placeholder(tf.float32, shape=[None, None, feat_dims], name='input')
     labels = tf.placeholder(tf.float32, shape=[None, num_sources, None, feat_dims], name='labels')

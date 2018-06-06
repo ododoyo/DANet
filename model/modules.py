@@ -45,9 +45,9 @@ class Estimator(object):
     def estimate(self, s_embed, s_mixed, s_sources, seq_mask):
         self.gen_tf_mask(s_sources)
         with tf.variable_scope(self.name):
-            return self._build(s_embed, s_mixed, s_sources, seq_mask)
+            return self._build(s_embed, s_mixed, seq_mask)
 
-    def _build(self, s_embed, s_mixed, s_sources, seq_mask):
+    def _build(self, s_embed, s_mixed, seq_mask):
         raise NotImplementedError()
 
 
@@ -109,7 +109,7 @@ class AverageEstimator(Estimator):
         if self.name is None:
             self.name = type(self).__name__
 
-    def _build(self, s_embed, s_mixed, s_sources, seq_mask):
+    def _build(self, s_embed, s_mixed, seq_mask):
         embedding_dim = tf.shape(s_embed)[3]
         batch_size = tf.shape(s_embed)[0]
         N = self._cfg.MAX_SOURCE_NUM
@@ -135,13 +135,15 @@ class ThresholdedAverageEstimator(Estimator):
         if self.name is None:
             self.name = type(self).__name__
 
-    def _build(self, s_embed, s_mixed, s_sources, seq_mask):
+    def _build(self, s_embed, s_mixed, seq_mask):
         embedding_dim = tf.shape(s_embed)[3]
         batch_size = tf.shape(s_embed)[0]
         N = self._cfg.MAX_SOURCE_NUM
-        threshold = self._cfg.threshold
-        s_wgt = tf.cast(tf.less(threshold, s_mixed), tf.float32)
-        s_wgt = tf.reshape(s_wgt, [batch_size, 1, -1, 1])
+        percent = self._cfg.threshold
+        # threshold
+        s_wgt = tf.reshape(s_mixed, [batch_size, 1, -1, 1])
+        threshold = tf.contrib.distributions.percentile(s_wgt, percent * 100, axis=2, keep_dims=True)
+        s_wgt = tf.cast(tf.less(threshold, s_wgt), tf.float32)
         # [B, 1, T*F, 1]
         count = tf.multiply(tf.ones_like(s_mixed), tf.expand_dims(seq_mask, axis=2))
         count = tf.reshape(count, [batch_size, 1, -1, 1])
@@ -165,7 +167,7 @@ class WeightedAverageEstimator(Estimator):
         if self.name is None:
             self.name = type(self).__name__
 
-    def _build(self, s_embed, s_mixed, s_sources, seq_mask):
+    def _build(self, s_embed, s_mixed, seq_mask):
         embedding_dim = tf.shape(s_embed)[3]
         batch_size = tf.shape(s_embed)[0]
         N = self._cfg.MAX_SOURCE_NUM
@@ -193,7 +195,7 @@ class AnchoredEstimator(Estimator):
         if self.name is None:
             self.name = type(self).__name__
 
-    def _build(self, s_embed, s_mixed, s_sources, seq_mask):
+    def _build(self, s_embed, s_mixed, seq_mask):
         embedding_dim = self._cfg.embedding_dim
         batch_size = tf.shape(s_embed)[0]
         N = self._cfg.MAX_SOURCE_NUM

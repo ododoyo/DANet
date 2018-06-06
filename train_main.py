@@ -11,13 +11,6 @@ import numpy as np
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = '3'
 tf.logging.set_verbosity(tf.logging.ERROR)
 
-def get_num_gpus():
-    gpu = cfg.gpu
-    gpu = gpu.replace(' ', '')
-    num_gpus = len(gpu.split(','))
-    os.environ["CUDA_VISIBLE_DEVICES"] = gpu
-    return num_gpus
-
 
 class Trainer(object):
     def __init__(self):
@@ -81,7 +74,7 @@ class Trainer(object):
 
 
 if __name__ == "__main__":
-    num_gpus = get_num_gpus()
+    num_gpus = get_num_gpus(cfg.gpu)
     print("Use {:d} gpus: {}".format(num_gpus, cfg.gpu))
 
     sess_config = tf.ConfigProto()
