@@ -49,7 +49,7 @@ class DANmodel(object):
         if self.cmvn is not None:
             mean_var = self.cmvn[:, 0]
             variance_var = self.cmvn[:, 1]
-            encoder_input = (s_mixed_log_magn - mean_var) / variance_var
+            encoder_input = (s_mixed_log_magn - mean_var) / np.sqrt(variance_var)
         self.s_embed = encoder.encode(encoder_input, seq_lens, fw_dropout_keep, recur_dropout_keep)
 
         # estimator in train and valid process
