@@ -39,7 +39,7 @@ for i_type in data_type:
     write_ff = open(os.path.join(record_dir, 'feats.ark'), 'wb')
     write_gf = open(os.path.join(record_dir, 'gender.ark'), 'wb')
     write_lenf = open(os.path.join(record_dir, 'feats.len'), 'w')
-    mean_var_file = os.path.join(record_dir, 'global.cmvn')
+    mean_var_file = os.path.join(record_dir, 'global.cmvn.log')
     feat_mean = np.zeros(feat_dims, dtype=np.float32)
     feat_variance = np.ones(feat_dims, dtype=np.float32)
     with open(list_file, 'r') as list_f:
@@ -78,10 +78,11 @@ for i_type in data_type:
             s3_angle = np.angle(s3_stft)
 
             num_frames = mix_stft.shape[0]
+            log_mix_magn = np.log(mix_abs + 1)
             write_lenf.write(key + ' ' + str(num_frames) + '\n')
             for i in range(num_frames):
                 feat_mean, feat_variance = moving_average(feat_mean, feat_variance,
-                                                          mix_abs[i], decay)
+                                                          log_mix_magn[i], decay)
 
             mix_data = np.concatenate((mix_abs, mix_angle), axis=1)
             s1_data = np.concatenate((s1_abs, s1_angle), axis=1)
