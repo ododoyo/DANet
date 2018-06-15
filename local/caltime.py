@@ -3,9 +3,9 @@ import os
 import tensorflow as tf
 
 dir_root = "/mnt/hd8t/fsl/SpeechSeparation/mix"
-data_root = "data/2speakers/wav8k/min"
+data_root = "data/3speakers/wav8k/min"
 data_type = ['tr', 'cv', 'tt']
-name_pre = "mix2spk/mix_2_spk_min_"
+name_pre = "mix3spk/mix_3_spk_min_"
 
 for i_type in data_type:
     name_path = name_pre + i_type + '_mix'
