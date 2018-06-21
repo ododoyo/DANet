@@ -126,6 +126,8 @@ def build_model(cfg, job_env, num_gpus=1):
 def build_eval_model(cfg, job_env, input_style, num_gpus=1, next_batch=None):
     if cfg.global_cmvn_norm:
         cmvn = np.loadtxt(job_env.global_cmvn_file, dtype=np.float32)
+        # get theta
+        cmvn[:, 1] = np.sqrt(cmvn[:, 1])
     else:
         cmvn = None
     if input_style == 0:

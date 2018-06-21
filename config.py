@@ -10,7 +10,7 @@ valid_dir = "/mnt/hd8t/fsl/SpeechSeparation/mix/data/2speakers/wav8k/min/cv/cut_
 seed = 123
 gpu = '0'  # [0, 1, 2] correspond [1, 0, 2]
 job_dir = "job/Anchor_6anc_4x300blstm_2spkr_20embed_dropout_psloss"
-job_type = "train"
+job_type = "eval"
 resume = False
 
 # feat config
@@ -60,7 +60,7 @@ decay_lr_count = 3
 decay_lr = 0.5
 weight_decay = 0.00001
 weight_decay_exclude = 'Bias:|b:|biases:|BatchNorm|anchors'
-loss_phase_sense = True
+loss_phase_sense = False
 
 # eval param
 eval_dir = "/mnt/hd8t/fsl/SpeechSeparation/mix/data/2speakers/wav8k/min/tt/record"

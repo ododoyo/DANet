@@ -20,7 +20,7 @@ for i_type in data_type:
     cmvn_path = os.path.join(dir_path, 'global.cmvn.log')
     feats_path = os.path.join(dir_path, 'feats.scp')
     mean_var = np.zeros(feats_dim)
-    variance_var = np.zeros(feats_dim)
+    variance_var = np.ones(feats_dim)
     with open(feats_path, 'r') as f:
         for line in f.readlines():
             line = line.strip().split()
