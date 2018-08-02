@@ -262,9 +262,9 @@ def rnn_layer(layer_input, rnn_cell, num_hidden, activation,
                            reuse=tf.get_variable_scope().reuse)
         initial_fw = fw_cell.zero_state(tf.shape(layer_input)[0], tf.float32)
         initial_bw = bw_cell.zero_state(tf.shape(layer_input)[0], tf.float32)
-        fw_cell_dr = tf.contrib.rnn.DropoutWrapper(fw_cell, output_keep_prob=fw_dropout_keep,
+        fw_cell_dr = tf.contrib.rnn.DropoutWrapper(fw_cell, input_keep_prob=fw_dropout_keep,
                                                    state_keep_prob=recur_dropout_keep)
-        bw_cell_dr = tf.contrib.rnn.DropoutWrapper(bw_cell, output_keep_prob=fw_dropout_keep,
+        bw_cell_dr = tf.contrib.rnn.DropoutWrapper(bw_cell, input_keep_prob=fw_dropout_keep,
                                                    state_keep_prob=recur_dropout_keep)
         layer, _ = tf.nn.bidirectional_dynamic_rnn(fw_cell_dr, bw_cell_dr, layer_input,
                                                    sequence_length=tf.to_int32(seq_lens),
@@ -278,7 +278,7 @@ def rnn_layer(layer_input, rnn_cell, num_hidden, activation,
         fw_cell = rnn_cell(num_hidden, activation=activation,
                            reuse=tf.get_variable_scope().reuse)
         initial_fw = fw_cell.zero_state(tf.shape(layer_input)[0], tf.float32)
-        fw_cell_dr = tf.contrib.rnn.DropoutWrapper(fw_cell, output_keep_prob=fw_dropout_keep,
+        fw_cell_dr = tf.contrib.rnn.DropoutWrapper(fw_cell, input_keep_prob=fw_dropout_keep,
                                                    state_keep_prob=recur_dropout_keep)
         layer, _ = tf.nn.dynamic_rnn(fw_cell_dr, layer_input,
                                      sequence_length=seq_lens,

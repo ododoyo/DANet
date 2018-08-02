@@ -8,7 +8,7 @@ valid_dir = "/mnt/hd8t/fsl/SpeechSeparation/mix/data/2speakers/wav8k/min/cv/cut_
 
 # job
 seed = 123
-gpu = '0'  # [0, 1, 2] correspond [1, 0, 2]
+gpu = '0'
 job_dir = "job/Anchor_6anc_4x300blstm_2spkr_20embed_dropout_psloss"
 job_type = "eval"
 resume = False
